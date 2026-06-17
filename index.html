@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="theme-color" content="#1a0a2e"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="description" content="Raise mysterious star creatures in this cozy browser creature game."/>
+  <link rel="manifest" href="/public/manifest.json"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet"/>
+  <title>SKYLINGS: Fallen From The Stars</title>
+  <link rel="stylesheet" href="/src/style.css"/>
+</head>
+<body>
+
+<!-- ── LOADING ─────────────────────────────────────────────── -->
+<div id="load-screen">
+  <div class="load-logo">✦ SKYLINGS ✦</div>
+  <div class="load-sub">Fallen From The Stars</div>
+  <div class="load-track"><div class="load-fill" id="load-fill"></div></div>
+  <div class="load-msg" id="load-msg">Awakening the stars…</div>
+</div>
+
+<!-- ── GLOBAL LAYERS ────────────────────────────────────────── -->
+<canvas id="star-canvas"></canvas>
+<div class="ptc-wrap" id="ptcs"></div>
+<div class="notifs"  id="notifs"></div>
+
+<!-- Sleep overlay -->
+<div class="sleep-ov" id="sleep-ov">
+  <div class="sleep-emo" id="sleep-emo">💤</div>
+  <div class="sleep-title">Sweet Dreams…</div>
+  <div class="sleep-bar"><div class="sleep-fill" id="sleep-fill"></div></div>
+  <div class="sleep-sub" id="sleep-sub">Restoring energy…</div>
+</div>
+
+<!-- Evolution cinematic -->
+<div id="evo-screen">
+  <div class="evo-glow"></div>
+  <div class="evo-ring" id="evo-ring">⭐</div>
+  <div class="evo-title" id="evo-title">Evolution!</div>
+  <div class="evo-sub"   id="evo-sub">Your creature has grown!</div>
+</div>
+
+<!-- Modal -->
+<div class="modal-ov" id="modal-ov">
+  <div class="modal-box" id="modal-box">
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ── SCREENS ──────────────────────────────────────────────── -->
+
+<!-- INTRO -->
+<div class="screen" id="screen-intro">
+  <div class="intro-orb" id="intro-orb">✦</div>
+  <div class="intro-logo"><h1>SKYLINGS</h1><p>Fallen From The Stars</p></div>
+  <div class="intro-tag">Mysterious creatures buried inside meteorites for millennia await a Guardian to awaken them.</div>
+  <button class="btn-primary" id="btn-start">Begin Your Journey ✦</button>
+  <div class="intro-continue hidden" id="btn-continue">↩ Continue with <span id="continue-name"></span></div>
+</div>
+
+<!-- CINEMATIC -->
+<div class="screen" id="screen-cinematic">
+  <button class="cin-skip" id="cin-skip">Skip ✕</button>
+  <div class="cin-bg"><div class="cin-emoji" id="cin-emoji">🌌</div></div>
+  <div class="cin-panel">
+    <div class="cin-title" id="cin-title"></div>
+    <div class="cin-body"  id="cin-body"></div>
+    <div class="cin-footer">
+      <button class="cin-next" id="cin-next">Next →</button>
+      <div class="cin-dots" id="cin-dots"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CHOOSE -->
+<div class="screen" id="screen-choose">
+  <div class="choose-header">
+    <div class="choose-title">Choose Your Creature</div>
+    <div class="choose-sub">Each holds a unique destiny among the stars</div>
+  </div>
+  <div class="creature-cards" id="creature-cards"></div>
+  <div class="creature-detail" id="creature-detail">
+    <div><div class="cd-label">Select a creature above</div></div>
+  </div>
+  <div class="choose-footer">
+    <button class="btn-primary" id="btn-choose" style="width:100%;opacity:.35;pointer-events:none">
+      Choose This Creature ✦
+    </button>
+  </div>
+</div>
+
+<!-- NAME -->
+<div class="screen" id="screen-name">
+  <div class="name-wrap">
+    <span class="name-emo" id="name-emo">🥚</span>
+    <div class="name-title">What's Their Name?</div>
+    <div class="name-sub" id="name-sub">Choose a name for your new companion</div>
+    <input class="name-input" id="name-inp" maxlength="12" placeholder="Enter a name…"
+           autocomplete="off" spellcheck="false"/>
+    <div class="name-sugs" id="name-sugs"></div>
+    <button class="btn-primary" id="btn-name" style="width:100%">Let's Begin! ✦</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="screen-game">
+  <div class="scene-wrap">
+    <canvas id="game-three-canvas"></canvas>
+  </div>
+
+  <div class="mood-ring" id="mood-ring">🥚</div>
+
+  <div class="hud-top">
+    <div style="width:60px"></div>
+    <div class="hud-name-block" style="flex:1;padding-left:10px">
+      <div class="hud-name"      id="hud-name">???</div>
+      <div class="hud-stage-lbl" id="hud-stage">Stage 1 · Hatchling</div>
+    </div>
+    <div class="hud-right">
+      <button class="hud-btn" id="btn-ach">🏆</button>
+      <button class="hud-btn" id="btn-menu">⚙️</button>
+    </div>
+  </div>
+
+  <div class="xp-strip">
+    <div class="xp-nums">
+      <span class="xp-lbl" id="xp-lbl-l">✦ Star Progress</span>
+      <span class="xp-lbl" id="xp-lbl-r">0 / 120</span>
+    </div>
+    <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="dlg off" id="dlg"></div>
+
+  <!-- Tabbed bottom panel -->
+  <div class="bottom-panel" id="bottom-panel">
+    <div class="panel-tabs">
+      <button class="ptab on" data-tab="stats" ><span class="pt-i">📊</span>Stats</button>
+      <button class="ptab"    data-tab="actions"><span class="pt-i">🎯</span>Actions</button>
+      <button class="ptab"    data-tab="items"  ><span class="pt-i">🎒</span>Items</button>
+    </div>
+
+    <!-- Stats tab -->
+    <div class="tab-content on" id="tab-stats">
+      <div class="se-bar-wrap">
+        <div class="se-hdr"><span class="se-lbl">✦ Star Energy</span><span class="se-val" id="se-val">0</span></div>
+        <div class="se-track"><div class="se-fill" id="se-fill" style="width:0%"></div></div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-item"><div class="stat-hdr"><span class="stat-lbl">🍎 Hunger</span><span class="stat-val" id="sv-hunger">100</span></div><div class="stat-bar"><div class="stat-fill sf-hunger" id="sf-hunger" style="width:100%"></div></div></div>
+        <div class="stat-item"><div class="stat-hdr"><span class="stat-lbl">⚡ Energy</span><span class="stat-val" id="sv-energy">100</span></div><div class="stat-bar"><div class="stat-fill sf-energy" id="sf-energy" style="width:100%"></div></div></div>
+        <div class="stat-item"><div class="stat-hdr"><span class="stat-lbl">💖 Happy</span> <span class="stat-val" id="sv-happy" >100</span></div><div class="stat-bar"><div class="stat-fill sf-happy"  id="sf-happy"  style="width:100%"></div></div></div>
+        <div class="stat-item"><div class="stat-hdr"><span class="stat-lbl">✨ Clean</span> <span class="stat-val" id="sv-clean" >100</span></div><div class="stat-bar"><div class="stat-fill sf-clean"  id="sf-clean"  style="width:100%"></div></div></div>
+      </div>
+    </div>
+
+    <!-- Actions tab -->
+    <div class="tab-content" id="tab-actions">
+      <div class="action-grid">
+        <button class="act-btn feed"    id="act-feed"   ><span class="ai">🍎</span><span class="al">Feed</span></button>
+        <button class="act-btn sleep"   id="act-sleep"  ><span class="ai">💤</span><span class="al">Sleep</span></button>
+        <button class="act-btn play"    id="act-play"   ><span class="ai">🎮</span><span class="al">Play</span></button>
+        <button class="act-btn clean"   id="act-clean"  ><span class="ai">🛁</span><span class="al">Clean</span></button>
+        <button class="act-btn train"   id="act-train"  ><span class="ai">⚡</span><span class="al">Train</span></button>
+        <button class="act-btn explore" id="act-explore"><span class="ai">🌌</span><span class="al">Explore</span></button>
+      </div>
+    </div>
+
+    <!-- Items tab -->
+    <div class="tab-content" id="tab-items">
+      <div class="items-grid" id="items-grid"></div>
+    </div>
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <button class="nb on" id="nav-home"><span class="ni">🏠</span><span class="nl">Home</span></button>
+    <button class="nb"    id="nav-play"><span class="ni">🎮</span><span class="nl">Minigames</span></button>
+    <button class="nb"    id="nav-bond"><span class="ni">💫</span><span class="nl">Bond</span></button>
+    <button class="nb"    id="nav-ach" ><span class="ni">🏆</span><span class="nl">Awards</span></button>
+  </div>
+</div>
+
+<!-- MINIGAME -->
+<div class="screen" id="screen-minigame">
+  <div class="mg-hdr">
+    <button class="hud-btn" id="mg-back">←</button>
+    <div class="mg-title-txt" id="mg-title">Minigame</div>
+    <div class="mg-score-txt">⭐ <span id="mg-score">0</span></div>
+  </div>
+  <div class="mg-canvas-wrap">
+    <canvas id="mg-canvas"></canvas>
+    <div class="mg-result" id="mg-result">
+      <div class="mgr-title"  id="mgr-title">Amazing!</div>
+      <div class="mgr-score"  id="mgr-score">Stars: 0</div>
+      <div class="mgr-reward" id="mgr-reward">+20 Star Energy!</div>
+      <button class="btn-primary"  id="mg-again" style="margin-top:4px">Play Again</button>
+      <button class="m-btn-sec"    id="mg-done"  style="max-width:200px;margin:0 auto">Back to Game</button>
+    </div>
+  </div>
+</div>
+
+<!-- ACHIEVEMENTS -->
+<div class="screen" id="screen-achievements">
+  <div class="ach-hdr">
+    <button class="ach-back" id="ach-back">←</button>
+    <div class="ach-hdr-title">🏆 Awards</div>
+    <div class="ach-count" id="ach-count">0/0</div>
+  </div>
+  <div class="ach-list" id="ach-list"></div>
+</div>
+
+<!-- ENDING -->
+<div class="screen" id="screen-ending">
+  <div class="end-wrap">
+    <div class="end-emo"   id="end-emo">⭐</div>
+    <div class="end-title" id="end-title">Journey Complete</div>
+    <div class="end-sub"   id="end-sub">A new chapter begins</div>
+    <div class="end-txt"   id="end-txt"></div>
+    <div class="end-stats" id="end-stats"></div>
+    <button class="btn-primary" id="btn-replay">New Journey ✦</button>
+  </div>
+</div>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
